@@ -13,9 +13,13 @@ module Commands
         end
 
         item_for_content_store = live_payload(live_content_item)
-        Adapters::ContentStore.call(live_content_item.base_path, item_for_content_store)
 
         send_to_message_queue!(item_for_content_store)
+        ContentStoreWorker.perform_async(
+          content_store: Adapters::ContentStore,
+          base_path: live_content_item.base_path,
+          payload: item_for_content_store,
+        )
 
         Success.new(content_id: content_id)
       end
