@@ -10,14 +10,22 @@ module Commands
         end
 
         if (draft_content_item = DraftContentItem.find_by(content_id: link_params.fetch(:content_id)))
-          Adapters::DraftContentStore.call(draft_content_item.base_path, content_store_payload(draft_content_item))
+          ContentStoreWorker.perform_async(
+            content_store: Adapters::DraftContentStore,
+            base_path: draft_content_item.base_path,
+            payload: content_store_payload(draft_content_item),
+          )
         end
 
         if (live_content_item = LiveContentItem.find_by(content_id: link_params.fetch(:content_id)))
           content_store_payload = content_store_payload(live_content_item)
 
-          Adapters::ContentStore.call(live_content_item.base_path, content_store_payload)
           PublishingAPI.service(:queue_publisher).send_message(content_store_payload)
+          ContentStoreWorker.perform_async(
+            content_store: Adapters::ContentStore,
+            base_path: live_content_item.base_path,
+            payload: content_store_payload,
+          )
         end
 
         Success.new(links: link_set.links)
