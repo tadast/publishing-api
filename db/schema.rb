@@ -73,5 +73,13 @@ ActiveRecord::Schema.define(version: 20151022135849) do
   add_index "live_content_items", ["content_id", "locale"], name: "index_live_content_items_on_content_id_and_locale", unique: true, using: :btree
   add_index "live_content_items", ["draft_content_item_id"], name: "index_live_content_items_on_draft_content_item_id", using: :btree
 
+  create_table "versions", force: :cascade do |t|
+    t.integer  "target_id",               null: false
+    t.string   "target_type",             null: false
+    t.integer  "number",      default: 0, null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
   add_foreign_key "live_content_items", "draft_content_items"
 end
