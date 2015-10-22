@@ -13,9 +13,6 @@ class DraftContentItem < ActiveRecord::Base
   before_validation :increment_version
 
   validates :content_id, presence: true
-  validate :content_ids_match
-  validates :version, presence: true
-  validates_with VersionValidator::Draft
 
   def refreshed_live_item
     if live_content_item

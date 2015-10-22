@@ -25,9 +25,6 @@ class LiveContentItem < ActiveRecord::Base
 
   validates :draft_content_item, presence: true
   validates :content_id, presence: true
-  validate :content_ids_match
-  validates :version, presence: true
-  validates_with VersionValidator::Live
 
   def version=(_)
     message = "Cannot set version manually. It is automatically set from the draft."

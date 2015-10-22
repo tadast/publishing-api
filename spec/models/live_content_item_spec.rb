@@ -36,11 +36,6 @@ RSpec.describe LiveContentItem do
       expect(subject).to be_invalid
     end
 
-    it "requires that the content_ids match" do
-      subject.content_id = "something else"
-      expect(subject).to be_invalid
-    end
-
     it "does not allow you to change the record's version" do
       expect {
         subject.version = 123
