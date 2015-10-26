@@ -1,13 +1,11 @@
 ENV['RAILS_ENV']='test'
 require 'webmock'
 require 'pact/provider/rspec'
-require "govuk/client/test_helpers/url_arbiter"
 
 WebMock.disable!
 
 Pact.configure do | config |
   config.reports_dir = "spec/reports/pacts"
-  config.include GOVUK::Client::TestHelpers::URLArbiter
   config.include WebMock::API
   config.include WebMock::Matchers
 end
@@ -56,7 +54,6 @@ Pact.provider_states_for "GDS API Adapters" do
       set_up do
         DatabaseCleaner.clean_with :truncation
 
-        stub_default_url_arbiter_responses
         stub_request(:put, Regexp.new('\A' + Regexp.escape(Plek.find('content-store')) + "/content"))
         stub_request(:put, Regexp.new('\A' + Regexp.escape(Plek.find('draft-content-store')) + "/content"))
         stub_request(:delete, Regexp.new('\A' + Regexp.escape(Plek.find('content-store')) + "/publish-intent"))
@@ -71,7 +68,6 @@ Pact.provider_states_for "GDS API Adapters" do
     set_up do
       DatabaseCleaner.clean_with :truncation
       FactoryGirl.create(:path_reservation, base_path: "/test-item", publishing_app: "publisher")
-      url_arbiter_has_registration_for("/test-item", "Publisher")
     end
   end
 
@@ -104,7 +100,6 @@ Pact.provider_states_for "GDS API Adapters" do
       DatabaseCleaner.clean_with :truncation
 
       FactoryGirl.create(:draft_content_item, content_id: "bed722e6-db68-43e5-9079-063f623335a7")
-      stub_default_url_arbiter_responses
       stub_request(:put, Regexp.new('\A' + Regexp.escape(Plek.find('content-store')) + "/content"))
     end
   end
@@ -114,7 +109,6 @@ Pact.provider_states_for "GDS API Adapters" do
       DatabaseCleaner.clean_with :truncation
 
       FactoryGirl.create(:live_content_item, content_id: "bed722e6-db68-43e5-9079-063f623335a7")
-      stub_default_url_arbiter_responses
       stub_request(:put, Regexp.new('\A' + Regexp.escape(Plek.find('content-store')) + "/content"))
     end
   end
@@ -132,7 +126,6 @@ Pact.provider_states_for "GDS API Adapters" do
       stub_request(:put, Regexp.new('\A' + Regexp.escape(Plek.find('content-store')) + "/content"))
       stub_request(:put, Plek.find('content-store') + "/content#{draft_content_item.base_path}")
         .to_return(status: 422, body: error_response.to_json, headers: {})
-      stub_default_url_arbiter_responses
       stub_request(:put, Regexp.new('\A' + Regexp.escape(Plek.find('draft-content-store')) + "/content"))
       stub_request(:delete, Regexp.new('\A' + Regexp.escape(Plek.find('content-store')) + "/publish-intent"))
         .to_return(status: 404, body: "{}", headers: {"Content-Type" => "application/json"} )
