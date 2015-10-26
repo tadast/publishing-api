@@ -47,8 +47,8 @@ Pact.provider_states_for "GDS API Adapters" do
   end
 
   [
-    "both content stores and url-arbiter empty",
-    "both content stores and the url-arbiter are empty"
+    "both content stores empty",
+    "both content stores are empty"
   ].each do |provide_state_title|
     provider_state provide_state_title do
       set_up do
@@ -64,7 +64,7 @@ Pact.provider_states_for "GDS API Adapters" do
     end
   end
 
-  provider_state "/test-item has been reserved in url-arbiter by the Publisher application" do
+  provider_state "/test-item has been reserved by the Publisher application" do
     set_up do
       DatabaseCleaner.clean_with :truncation
       FactoryGirl.create(:path_reservation, base_path: "/test-item", publishing_app: "publisher")
